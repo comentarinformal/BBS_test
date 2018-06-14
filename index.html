@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test</title>
+		<style>
+			body{
+                background-color:black;
+                padding:0 !important;
+                margin:0 !important;
+                color:white;
+                font-family:consolas;
+                font-size:15px}
+			#pointer{
+                margin-left:0px;
+				vertical-align: middle;
+				background-color:white;
+				color:black;
+			}
+			.pointerAnim{
+                -webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-name: pointerswitch;
+				animation-name: pointerswitch;
+				-webkit-animation-direction:alternate;
+				animation-direction:alternate;
+				-webkit-animation-iteration-count:infinite;
+				animation-iteration-count:infinite;
+				-webkit-animation-timing-function: steps(1,start);
+				animation-timing-function: steps(1,start);
+            }
+            .outputBlock{
+                position:absolute;
+				font-size:15px;
+				display:inline-block;
+				height:20px;
+				width:10px;
+            }
+			@-webkit-keyframes pointerswitch{
+				0%,100%{
+					background-color: #000;
+					color: #aaa;
+				}
+				50% {
+					background-color: #fff;
+					color: #aaa;
+				}
+			}
+            @keyframes pointerswitch{
+				0%,100%{
+					background-color: #000;
+					color: #aaa;
+				}
+				50% {
+					background-color: #fff;
+					color: #aaa;
+				}
+			}
+		</style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+	<body>
+	<div id="pointer" class="pointerAnim outputBlock"></div>
+        
+    <script>
+		var raw_horizontal,raw_vertical,Pointer,adaptedX,adaptedEndX,adaptedY,adaptedEndY,horizMove,curValX,curValY;
+        var outputHolder = new Array();
+        Pointer = $('#pointer');
+        raw_horizontal = $(window).width();
+        raw_vertical = $(window).height();
+		function addSingleLine(start,end,secondVar,dir,printchar,frontcol,bgcol){
+            frontcol = frontcol !== undefined ? frontcol : 'white';
+            bgcol =  bgcol !== undefined ? bgcol : 'black';
+            
+            if(dir == 'horizontal'){ 
+                adapted = Math.round(start / 10);
+                adaptedEnd = Math.round(end / 10);
+                secondVar = Math.round(secondVar / 20);
+                for(i=0;i<=(adaptedEnd-adapted);i++){
+                    addSingleBlock(start + (i*10),secondVar*20,printchar,frontcol,bgcol);
+                 }
+            } else {
+                adapted = Math.round(start / 20);
+                adaptedEnd = Math.round(end / 20);
+                secondVar = Math.round(secondVar / 10);
+                for(i=0;i<=(adaptedEnd-adapted);i++){
+                     addSingleBlock(secondVar*10,start + (i*20),printchar,frontcol,bgcol);
+                } 
+            }
+            
+		}
+        function addSingleBlock(positionx,positiony,character,frontcol,bgcol){
+            adaptedX = Math.round(positionx * 10);
+            adaptedY = Math.round(positiony * 20);
+            frontcol = frontcol !== undefined ? frontcol : 'white';
+            bgcol =  bgcol !== undefined ? bgcol : 'black';
+            if(outputHolder[adaptedY] === undefined){
+                outputHolder[adaptedY] = new Array();
+            }
+            if(outputHolder[adaptedY][adaptedX] === undefined){
+                outputHolder[adaptedY][adaptedX] = new Array();
+            }
+                outputHolder[adaptedY][adaptedX] = [character.charAt(0),frontcol,bgcol,10,20];
+        }
+        function addTextLine(positionx,positiony,string,frontcol,bgcol){
+            adaptedX = Math.round(positionx / 10);
+            adaptedY = Math.round(positiony / 20);
+            frontcol = frontcol !== undefined ? frontcol : 'white';
+            bgcol =  bgcol !== undefined ? bgcol : 'black';
+            for(i=0;i<string.length;i++){
+                if(outputHolder[adaptedY] === undefined){
+                    outputHolder[adaptedY] = new Array();
+                }
+                if(outputHolder[adaptedY][adaptedX + i] === undefined){
+                    outputHolder[adaptedY][adaptedX + i] = new Array();
+                }
+                    outputHolder[adaptedY][adaptedX + i] = [string.charAt(i),frontcol,bgcol,10,20];
+            }
+        }
+        
+       /* addSingleBlock(100,200,'!','black','red');
+        addSingleBlock(300,200,'H','black','red'); 
+        addSingleBlock(300,220,'E','black','red');
+        addSingleBlock(300,240,'L','black','red');
+        addSingleBlock(300,260,'L','black','red');
+        addSingleBlock(300,280,'O','black','red');
+        addSingleBlock(300,300,'!','black','red');*/
+        addSingleLine(0,raw_horizontal,100,'horizontal','@','red','white');
+        addSingleLine(300,1300,raw_vertical/3,'horizontal','#','green','white');
+        addSingleLine(raw_vertical/3,400,300,'vertical','#','red','white');
+        addSingleLine(raw_vertical/3,400,1300,'vertical','#','red','white');
+        addSingleLine(300,1300,400,'horizontal','#','green','white');
+		addSingleBlock(5,5,'C','red','yellow');
+        addTextLine(700,raw_vertical/2,'Hello facepunch!','black','red');
+		function drawOutput(){
+                 horizMove = setInterval(function(){
+                     curPos = $(Pointer).position();
+                     curValX = curPos.left + 10;
+                     fantasyValX = Math.round(curValX / 10);
+                     curValY = curPos.top;
+                     fantasyValY = Math.round(curValY / 20);
+                     if(outputHolder !== undefined && outputHolder[fantasyValY] !== undefined){
+                        $(Pointer).css('left',curValX+'px');
+                         
+                         
+                         if(outputHolder[fantasyValY][fantasyValX] !== undefined){
+                             console.log(fantasyValX+" - FANTASY VAL X ; "+fantasyValY+"FANTASY VAL Y");
+                             $('body').append('<div class="outputBlock" style="color:'+outputHolder[fantasyValY][fantasyValX][1]+';background-color:'+outputHolder[fantasyValY][fantasyValX][2]+';top:'+curValY+'px;left:'+curValX+'px">'+outputHolder[fantasyValY][fantasyValX][0]+'</div>');
+                         } else {
+                          $(Pointer).text('');   
+                         }
+                         
+                    } else {
+                        $(Pointer).css('top',(curPos.top+20)+'px').css('left','0px');
+                    }
+                     $(Pointer).removeClass('pointerAnim').css('color','black').css('background-color','white');
+                    if(curPos.left > raw_horizontal - 60 || curPos.top > raw_vertical - 50){
+                        if(curPos.top > raw_vertical - 50){
+                        clearInterval(horizMove);
+                            $(Pointer).addClass('pointerAnim');
+                            return;
+                        } else {
+                            $(Pointer).css('top',(curValY+20)+'px').css('left','0px');
+                        }
+                    }
+                     
+                     
+                 },1);   
+		}
+		setTimeout(drawOutput,1000);
+		</script>
+	</body>
+</html>
